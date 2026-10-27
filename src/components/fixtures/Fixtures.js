@@ -93,6 +93,7 @@ const Fixtures = ({
                             ...parseMatchResult(match.match_result),
                             status: match.match_status?.status || 'pending',
                             winner_team_id: match.match_status?.is_final ? match.match_status?.winner_team_id : null,
+                            outcome: match.outcome || match.match_status?.outcome || 'REGULAR',
                         });
                         return;
                     }
@@ -116,6 +117,7 @@ const Fixtures = ({
                         ...parseMatchResult(match.match_result),
                         status: match.match_status?.status || 'pending',
                         winner_team_id: match.match_status?.is_final ? match.match_status?.winner_team_id : null,
+                        outcome: match.outcome || match.match_status?.outcome || 'REGULAR',
                         team1_id: match.team1?.team_id,
                         team2_id: match.team2?.team_id,
                         team1_checked_in: match.team1?.checked_in,
@@ -300,8 +302,12 @@ const Fixtures = ({
                     <div className={styles.matchId}>
                         Match ID: {match.match_id}
                     </div>
+                    {match.outcome === 'WALKOVER' && (
+                        <div className={styles.outcomeBadge}>WALKOVER</div>
+                    )}
                     <div className={styles.teams}>
                         <div className={`${styles.team} ${
+                            match.winner_team_id === match.team1_id ? styles.winner : ''} ${
                             match.team1_checked_in === true ? styles.checkedIn : ''
                         }`}>
                             <div className={styles.teamPlayers}>{match.team1_players}</div>
@@ -312,6 +318,7 @@ const Fixtures = ({
                         </div>
                         <div className={styles.vs}>vs</div>
                         <div className={`${styles.team} ${
+                            match.winner_team_id === match.team2_id ? styles.winner : ''} ${
                             match.team2_checked_in === true ? styles.checkedIn : ''
                         }`}>
                             <div className={styles.teamPlayers}>{match.team2_players}</div>
@@ -361,8 +368,12 @@ const Fixtures = ({
                                         </div>
                                     )}
                                 </div>
+                                {match.outcome === 'WALKOVER' && (
+                                    <div className={styles.outcomeBadge}>WALKOVER</div>
+                                )}
                                 <div className={styles.teams}>
                                     <div className={`${styles.team} ${
+                                        match.winner_team_id === match.team1_id ? styles.winner : ''} ${
                                         match.team1_checked_in ? styles.checkedIn : ''
                                     }`}>
                                         <div className={styles.teamPlayers}>{match.team1_players}</div>
@@ -373,6 +384,7 @@ const Fixtures = ({
                                     </div>
                                     <div className={styles.vs}>vs</div>
                                     <div className={`${styles.team} ${
+                                        match.winner_team_id === match.team2_id ? styles.winner : ''} ${
                                         match.team2_checked_in ? styles.checkedIn : ''
                                     }`}>
                                         <div className={styles.teamPlayers}>{match.team2_players}</div>

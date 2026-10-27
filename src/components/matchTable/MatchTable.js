@@ -100,6 +100,7 @@ const MatchTable = ({ tournamentId }) => {
               <th>Team 2</th>
               <th>Result</th>
               <th>Status</th>
+              <th>Outcome</th>
             </tr>
           </thead>
           <tbody>
@@ -116,6 +117,7 @@ const MatchTable = ({ tournamentId }) => {
                     {match.match_status.status}
                   </span>
                 </td>
+                <td>{match.outcome === 'WALKOVER' && <span className={stl.outcomeBadge}>WALKOVER</span>}</td>
               </tr>
             ))}
           </tbody>

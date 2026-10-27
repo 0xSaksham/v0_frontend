@@ -5,7 +5,11 @@ const getBaseUrl = () => {
     typeof window !== "undefined" ? window.location.hostname : "";
 
   if (hostname == "localhost" || hostname == "127.0.0.1") {
-    return process.env.NEXT_PUBLIC_API_URL || "https://localhost:5001";
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  }
+
+  if (!hostname) {
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
   }
 
   // Development and UAT domains

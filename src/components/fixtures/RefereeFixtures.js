@@ -57,6 +57,9 @@ const RefereeFixtures = ({ tournamentId, totalRounds }) => {
                 <div className={styles.matchId}>
                     Match ID: {match.match_id}
                 </div>
+                {match.outcome === 'WALKOVER' && (
+                    <div className={styles.outcomeBadge}>WALKOVER</div>
+                )}
 
                 <div className={styles.teams}>
                     <div className={`${styles.team} ${

@@ -17,6 +17,8 @@ const MatchScreen = ({ tournamentId, matchId }) => {
     const [loading, setLoading] = useState(false);
     const [isModalOpen, setModalOpen] = useState(false);
     const [showStatusModal, setShowStatusModal] = useState(false);
+    const [showWalkoverModal, setShowWalkoverModal] = useState(false);
+    const [walkoverWinner, setWalkoverWinner] = useState("");
     const [matchStatus, setMatchStatus] = useState(null);
     const router = useRouter();
 
@@ -175,6 +177,37 @@ const MatchScreen = ({ tournamentId, matchId }) => {
         updateScore(true);
     };
 
+    const declareWalkover = async () => {
+        if (!walkoverWinner) {
+            toast.error("Select the team advancing by walkover");
+            return;
+        }
+
+        try {
+            const response = await fetch(endpoints.updateMatchScore, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    tournament_id: tournamentId,
+                    match_id: matchId,
+                    outcome: "WALKOVER",
+                    winner_team_id: walkoverWinner,
+                    score: "0-0",
+                    final: true
+                })
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Failed to declare walkover");
+            }
+            toast.success("Walkover declared successfully");
+            router.push(`/referee/${tournamentId}/matches`);
+        } catch (error) {
+            console.error("Failed to declare walkover:", error);
+            toast.error(error.message || "Failed to declare walkover");
+        }
+    };
+
     const handleStartMatch = async () => {
         try {
             await apiCall(`${endpoints.updateMatchStatus}/${matchId}`, {
@@ -258,6 +291,7 @@ const MatchScreen = ({ tournamentId, matchId }) => {
                 <div className={stl.actions}>
                     <button type="button" onClick={() => updateScore(false)}>Update</button>
                     <button type="button" onClick={finalizeScore}>Final</button>
+                    <button type="button" onClick={() => setShowWalkoverModal(true)}>Declare Walkover</button>
                 </div>
             </form>
 
@@ -267,6 +301,39 @@ const MatchScreen = ({ tournamentId, matchId }) => {
                         <p>Are you sure you want to finalize the scores?</p>
                         <button onClick={confirmFinalize} style={{ backgroundColor: '#4CAF50', color: 'white' }}>Confirm</button>
                         <button onClick={() => setModalOpen(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
+
+            {showWalkoverModal && (
+                <div className={stl.modal}>
+                    <div className={stl.modalContent}>
+                        <h3>Declare Walkover</h3>
+                        <p>Select the team advancing without a scored match.</p>
+                        <label>
+                            <input
+                                type="radio"
+                                name="walkoverWinner"
+                                value={scoreData.team1.team_id}
+                                checked={walkoverWinner === scoreData.team1.team_id}
+                                onChange={(event) => setWalkoverWinner(event.target.value)}
+                            />
+                            {scoreData.team1.name || scoreData.team1.team_id}
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="walkoverWinner"
+                                value={scoreData.team2.team_id}
+                                checked={walkoverWinner === scoreData.team2.team_id}
+                                onChange={(event) => setWalkoverWinner(event.target.value)}
+                            />
+                            {scoreData.team2.name || scoreData.team2.team_id}
+                        </label>
+                        <div>
+                            <button onClick={declareWalkover} style={{ backgroundColor: '#4CAF50', color: 'white' }}>Confirm Walkover</button>
+                            <button onClick={() => setShowWalkoverModal(false)}>Cancel</button>
+                        </div>
                     </div>
                 </div>
             )}

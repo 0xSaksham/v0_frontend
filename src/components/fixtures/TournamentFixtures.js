@@ -39,6 +39,7 @@ const TournamentFixtures = ({ tournamentId, totalRounds }) => {
                         ...parseMatchResult(match.match_result),
                         status: match.match_status?.status || 'pending',
                         winner_team_id: match.match_status?.is_final ? match.match_status?.winner_team_id : null,
+                        outcome: match.outcome || match.match_status?.outcome || 'REGULAR',
                     }));
                 setKnockoutMatches(knockoutMatchesArray);
             }
@@ -117,9 +118,14 @@ const TournamentFixtures = ({ tournamentId, totalRounds }) => {
                 <div className={styles.matchId}>
                     Match ID: {match.match_id}
                 </div>
+                {match.outcome === 'WALKOVER' && (
+                    <div className={styles.outcomeBadge}>WALKOVER</div>
+                )}
 
                 <div className={styles.teams}>
                     <div className={`${styles.team} ${
+                        match.winner_team_id === match.team1_id ? styles.winner : ''
+                    } ${
                         match.team1_checked_in === true ? styles.checkedIn : ''
                     }`}>
                         <div className={styles.teamPlayers}>{match.team1_players}</div>
@@ -130,6 +136,8 @@ const TournamentFixtures = ({ tournamentId, totalRounds }) => {
                     </div>
                     <div className={styles.vs}>vs</div>
                     <div className={`${styles.team} ${
+                        match.winner_team_id === match.team2_id ? styles.winner : ''
+                    } ${
                         match.team2_checked_in === true ? styles.checkedIn : ''
                     }`}>
                         <div className={styles.teamPlayers}>{match.team2_players}</div>
